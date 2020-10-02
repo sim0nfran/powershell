@@ -1,0 +1,90 @@
+##### Hyper-V management
+
+# View additional command parameters:
+Get-Command [cmdlet] | Select *
+
+
+
+### List existing VMs
+Get-VM
+
+# View all object details
+Get-VM -VMName <Name> | Select *
+
+# Narrow search by object
+Get-VM <Name> | Select HardDrives
+
+# Turn on/off VM
+Start-VM <Name>
+Stop-VM <Name>
+
+
+
+### Create VM
+New-VM -Name <Name> -Generation <1,2> -MemoryStartupBytes 4096MB -BootDevice VHD  
+
+# If creating new Virtual Hard Drive:
+ -NewVHDSizeBytes 32768MB -NewVHDPath "E:\Disks\<FileName>.vhdx"
+
+# If using existing Differencing Disk:
+ -VHDPath 'E:\Disks\<Differencing>.vhdx'
+
+# Delete VM
+Remove-VM <Name>
+
+# CPU
+Get-VMProcessor <Name>
+Set-VMProcessor <Name> -Count 4
+
+# RAM
+Get-VMMemory <Name>
+Set-VMMemory <Name> -StartupBytes 4GB -MinimumBytes 2GB -MaximumBytes 8GB-DynamicMemoryEnabled $true
+
+
+
+### Hard Drives
+Get-VHD 'E:\Disks\<FileName>.vhdx'
+Get-VM -VMName <Name> | Select VMId | Get-VHD | Select-Object Path,FileSize
+
+# Create new HD
+New-VHD -SizeBytes 32GB -Fixed -Path 'E:\Disks\<FileName>.vhdx'
+New-VHD -SizeBytes 32GB -Dynamic -Path 'E:\Disks\<FileName>.vhdx'
+
+# Create new Differencing
+New-VHD -Differencing -Path 'E:\Disks\<NewVHD>.vhdx' -ParentPath 'E:\Disks\<Parent>.vhdx'
+
+# Add disk to VM
+Add-VMHardDiskDrive -VMName <Name> -Path 'E:\Disks\<FileName>.vhdx'
+
+# Remove disk from VM
+Get-VMHardDiskDrive -VMName <Name>
+Remove-VMHardDiskDrive -VMName <Name> -ControllerType SCSI -ControllerNumber <0> -ControllerLocation <0>
+
+# Delete .vhdx file
+Remove-Item "E:\Disks\Disk.vhdx"
+
+
+
+### DVD Drives
+Get-VMDVDrive <Name>
+
+# Add DVD drive with ISO
+Add-VMDVDDrive -VMName <Name> -path "E:\ISOs\<FileName>.iso"
+
+# Remove ISO
+Set-VMDVDDrive -VMName <Name> -ControllerNumber <0> -ControllerLocation <1> -Path $null
+
+
+
+### Networking
+Get-VMSwitch
+
+# New Internal switch
+New-VMSwitch –Name LAN01 –SwitchType Internal
+
+# New External switch
+New-VMSwitch –Name WAN –NetAdapterName <NIC> –AllowManagement $true
+
+# Attach switch to VM
+Get-VMNetworkAdapter -VMName <Name>
+Add-VMNetworkAdapter -VMName <Name> -name WAN -SwitchName WAN

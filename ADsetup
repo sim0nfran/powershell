@@ -1,12 +1,12 @@
 ##### Server basic configuration
 
 sconfig
-# 2) Name
-# 5) Updates
-# 7) Remote Desktop
-# 8) IP/Subnet
-# 9) Time
-# 13) Restart
+ 2   Name
+ 5   Updates
+ 7   Remote Desktop
+ 8   IP/Subnet/DNS
+ 9   Time
+ 13  Restart
 
 # Install Active Directory
 Get-WindowsFeature | Where-Object {$_.Name -Like “*Domain*”}

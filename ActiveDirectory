@@ -1,0 +1,62 @@
+##### Active Directory basic commands
+
+### View all OUs
+Get-ADOrganizationalUnit -Filter *
+
+# Create Parent OU
+New-ADOrganizationalUnit -Name "<name>" -Path "DC=<Domain>,DC=com" -ProtectedFromAccidentalDeletion $False
+
+# Create Child OUs
+New-ADOrganizationalUnit -Name "<name>" -Path "OU=<1>,DC=<Domain>,DC=com" -ProtectedFromAccidentalDeletion $False
+New-ADOrganizationalUnit -Name "<name>" -Path "OU=<2>,OU=<1>,DC=<Domain>,DC=com" -ProtectedFromAccidentalDeletion $False
+
+
+### View all Users
+Get-ADUser -Filter *
+
+# Create User in OU
+New-ADUser -Name "Joe Schmo" -SamAccountName jschmo -Path "OU=Users,OU=<2>,OU=<1>,DC=<Domain>,DC=com"
+  -PasswordNeverExpires $true -AccountPassword(Read-Host -AsSecureString "Input Password") -Enabled $true 
+
+
+### View all Groups
+Get-ADGroup -Filter *
+
+# Create Group
+# DomainLocal   used to grant access to resources, eg. printers 
+# Global   used to group users together, eg. sales department 
+New-ADGroup -Name "SrAcctLocal" -SamAccountName SRAcctLocal -Path "OU=Groups,OU=<2>,OU=<1>,DC=<Domain>,DC=com"
+  -GroupCategory <Security/Distribution> -GroupScope <DomainLocal/Global>
+
+# Add User/Group to Group
+Add-ADGroupMember -Identity <$GROUP/$USER> -Members <$GROUP/$USER>
+
+
+
+##### DSADD
+# To create a user with the dsadd.exe utility, the distinguished name (DN) and the Security Account Manager (SAM - logon) name must be known
+# Components of the DN: 
+#    CN = Common Name separated by space 
+#    OU = Organizational Unit to add user into 
+#    DC = Domain Component, one for each level below root 
+
+# Create a user with additional attributes: 
+dsadd user “CN=Full Name,OU=Group,DC=Domain,DC=com”
+ -samid <SAMName>
+ -fn <FirstName>
+ -mi <Initial>
+ -ln <LastName>
+ -empid <EmployeeID>
+ -pwd <Password>
+ -desc <Description>
+ -memberof <Group>
+ -office <Office>
+ -tel <PhoneNumber>
+ -email <Email>
+ -dept <Department>
+ -company <Company>
+ -mustchpwd {yes | no}
+ -canchpwd {yes | no}
+ -pwdneverexpires {yes | no}
+ -acctexpires <NumberOfDays>
+ -disabled {yes | no}

@@ -1,3 +1,3 @@
 # powershell
 
-Handy scripts to have in Windows server/desktop
+Handy snippets to have in Windows server/desktop

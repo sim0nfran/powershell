@@ -1,0 +1,27 @@
+### Initialize Partition Format
+
+Get-Disk
+# With output:
+Initialize-Disk <#> -PartitionStyle <MBR/GPT> -PassThru | New-Partition -DriveLetter <E> -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel “<disk>”
+
+
+
+### Disk Management
+
+Get-Disk              Displays available disks seen by the OS
+
+Clear-Disk <#>        Removes all data and partition information, uninitializes disk 
+    -RemoveData       Flag to clear partitions
+
+Initialize-Disk <#>   Enables disk to be formatted and used
+    -PartitionStyle   Select between Master Boot Record (<2TB) / GUID Partition Table
+
+Format-Volume <E>     Choose Letter drive
+    -FileSystem <NTFS>
+
+Get-Partition         Displays all partitions on disk 
+
+New-Partition         Creates new partition on existing disk 
+    -DiskNumber <#>   Specify disk
+
+Remove-Partition      Deletes specified partition and underlying volumes

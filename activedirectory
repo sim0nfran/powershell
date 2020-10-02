@@ -1,0 +1,57 @@
+##### Server basic configuration
+
+sconfig
+# 2) Name
+# 5) Updates
+# 7) Remote Desktop
+# 8) IP/Subnet
+# 9) Time
+# 13) Restart
+
+# Install Active Directory
+Get-WindowsFeature | Where-Object {$_.Name -Like “*Domain*”}
+Add-WindowsFeature AD-Domain-Services -IncludeManagementTools
+
+# Create a new Forest
+Install-ADDSForest -DomainName <DOMAIN> -InstallDNS -DomainNetBIOSName <NetBIOS>
+# Enter Admin Password and Yes to All [A] to restart – update DNS and Firewall
+
+# Add 2nd Domain Controller
+Get-WindowsFeature AD-Domain-Services
+Add-WindowsFeature AD-Domain-Services
+Install-ADDSDomainController -DomainName <DOMAIN> -InstallDNS -Credential (Get-Credential “<NetBIOS>\Administrator”)
+# Enter Admin Password and Yes to All [A] to restart
+
+# Turn off Windows Firewall
+Set-NetFirewallProfile -Profile Public,Private,Domain -Enabled False
+
+
+
+##### Client basic configuration
+
+# Networking
+Get-NetIpInterface
+
+# Ethernet interface identified with:
+# -InterfaceAlias <Ethernet>
+# -InterfaceIndex <6>
+
+Set-NetIpAddress -InterfaceAlias <Ethernet> -IpAddress <IP> -PrefixLength <CIDR> -DefaultGateway <IP>
+Set-DNSClientServerAddress -InterfaceIndex <6> -ServerAddresses (“<IP1>”,“<IP2>”) 
+
+# Turn off Windows Update
+sc.exe config wuauserv start= disabled
+sc.exe stop wuauserv
+# Verify
+sc.exe start wuauserv
+
+# Hostname
+Rename-Computer -NewName “<NAME>” -Restart
+
+# Join a Domain
+Add-Computer –DomainName <DOMAIN> -Credential <NetBIOS>\Administrator
+Restart-Computer
+
+# Remote config
+Enable-PSRemoting
+Enter-PSSession <NetBIOS>

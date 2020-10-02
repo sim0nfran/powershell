@@ -1,0 +1,20 @@
+##### iSCSI
+
+Get-WindowsFeature |Where-Object {$_.Name -like “*iSCSI*”}
+Install-WindowsFeature FS-iSCSITarget-Server
+Install-WindowsFeature iSCSITarget-VSS-VDS
+
+
+
+##### NFS
+
+Get-WindowsFeature |Where-Object {$_.Name -like “*NFS*”}
+Add-WindowsFeature FS-NFS-Service -IncludeManagementTools
+
+New-NFSShare –Name <nfs> –Path “<E:\nfs>” -Authentication all –EnableUnmappedAccess $true –Permission readwrite
+
+# Client
+
+Get-WindowsOptionalFeature -Online | Where-Object {$_.FeatureName -Like “*NFS*”}
+Enable-WindowsOptionalFeature -Online -FeatureName ServicesforNFS-ClientOnly
+Enable-WindowsOptionalFeature -Online -FeatureName ClientforNFS-Infrastructure
